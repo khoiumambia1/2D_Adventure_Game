@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import javax.swing.JPanel;
 
 import entity.Player;
@@ -16,6 +19,17 @@ public class GamePanel extends JPanel implements Runnable {
     final int originalTileSize = 16;
     final int scale = 3;
     public final int tileSize = originalTileSize * scale;
+    
+    public long gameStartTime;
+
+    public long firstKeyPickupTime;
+    public long secondKeyPickupTime;
+    public long thirdKeyPickupTime;
+
+    public boolean firstKeyCollected = false;
+    public boolean secondKeyCollected = false;
+    public boolean thirdKeyCollected = false;
+
 
     public final int maxScreenCol = 16;
     public final int maxScreenRow = 12;
@@ -38,14 +52,16 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     public CollisionChecker cChecker = new CollisionChecker(this);
     public AssetSetter aSetter = new AssetSetter(this);
+    public UI ui = new UI(this);
     
     public Player player = new Player(this,keyH);
     public SuperObject obj[]= new SuperObject[10];
     
     
     public GamePanel() {
+    	gameStartTime = System.currentTimeMillis();
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-        this.setBackground(Color.pink);
+        this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
@@ -59,7 +75,37 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread = new Thread(this);
         gameThread.start();
     }
+    
+ // Save time to local file
+    public void saveTimeToFile(String event, double time) {
+        try (FileWriter fw = new FileWriter("game_times.txt", true)) {
+            fw.write(event + " : " + time + " seconds\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void recordEvent(String eventName, long eventTimeMillis) {
+        double timeSeconds = eventTimeMillis / 1000.0;
 
+        // 1️⃣ Save to local file
+        try (FileWriter fw = new FileWriter("game_times.txt", true)) {
+            fw.write(eventName + " : " + timeSeconds + " seconds\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 2️⃣ Save to Snowflake
+        SnowflakeConnector.saveEvent(eventName, timeSeconds);
+    }
+    
+    public double getGameTimeSeconds() {
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - gameStartTime) / 1000.0;
+    }
+
+    
+    
     @Override
     // public void run() {
 
@@ -93,7 +139,9 @@ public class GamePanel extends JPanel implements Runnable {
     //         }
     //     }
     // }
-
+    
+    
+    
 
     public void run()
     {
@@ -147,6 +195,7 @@ public class GamePanel extends JPanel implements Runnable {
         
         player.draw(g2);
 
+        ui.draw(g2);
         g2.dispose();
     }
 }

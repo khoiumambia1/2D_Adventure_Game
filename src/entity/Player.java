@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -19,7 +20,7 @@ public class Player extends Entity{
     
     public final int screenX;
     public final int screenY;
-    int hasKey =0;
+    public int hasKey =0;
     
     public Player(GamePanel gp, KeyHandler keyH) {
     	this.gp = gp;
@@ -116,27 +117,67 @@ public class Player extends Entity{
     }
 
     public void pickupObject(int i) {
-    	if(i!=999) {
-    		
-    		String objectName = gp.obj[i].name;
-    		
-    		switch(objectName) {
-    		case"Key":
-    			hasKey++;
-    			gp.obj[i] = null;
-    			System.out.println("Key: "+ hasKey);
-    			break;
-    		case"Door":
-    			if(hasKey>0) {
-    				gp.obj[i]= null;
-    				hasKey--;
-    			}
-    			System.out.println("Key: "+ hasKey);
-    			break;
-    		}
-    	}
-    	
+
+        if(i != 999) {
+
+            String objectName = gp.obj[i].name;
+            long now = System.currentTimeMillis();
+
+            switch(objectName) {
+
+            case "Key":
+                hasKey++;
+
+                if(hasKey == 1) {
+                    gp.firstKeyPickupTime = now;
+                    gp.recordEvent("FIRST_KEY", now - gp.gameStartTime);
+
+                } else if(hasKey == 2) {
+                    gp.secondKeyPickupTime = now;
+                    gp.recordEvent("SECOND_KEY", now - gp.gameStartTime);
+
+                } else if(hasKey == 3) {
+                    gp.thirdKeyPickupTime = now;
+                    gp.recordEvent("THIRD_KEY", now - gp.gameStartTime);
+                }
+
+                gp.obj[i] = null;
+                gp.ui.showMessage("You got a key!");
+                break;
+
+            case "Door":
+
+                if(hasKey > 0) {
+
+                    if(hasKey == 1) {
+                        gp.recordEvent("FIRST_KEY_TO_DOOR", now - gp.firstKeyPickupTime);
+
+                    } else if(hasKey == 2) {
+                        gp.recordEvent("SECOND_KEY_TO_DOOR", now - gp.secondKeyPickupTime);
+
+                    } else if(hasKey == 3) {
+                        gp.recordEvent("THIRD_KEY_TO_DOOR", now - gp.thirdKeyPickupTime);
+
+                        // TOTAL GAME TIME
+                        gp.recordEvent("TOTAL_GAME_TIME", now - gp.gameStartTime);
+                    }
+
+                    gp.obj[i] = null;
+                    hasKey--;
+                    gp.ui.showMessage("Door opened!");
+                }
+                else
+                {
+                	gp.ui.showMessage("You need a key!");
+                }
+                break;
+            case "Chest":
+            	gp.ui.gameFinished =true;
+            	break;
+            }
+        }
     }
+
  
 
     public void draw(Graphics2D g2) {
@@ -159,6 +200,10 @@ public class Player extends Entity{
         }
 
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+        g2.setColor(Color.red);
+        g2.drawRect(screenX+solidArea.x,screenY+solidArea.y,solidArea.width,solidArea.height);
+        
+        
     }
 
 }
