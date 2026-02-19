@@ -16,6 +16,8 @@ public class UI {
 	public String message = "";
 	int messageCounter =0;
 	public boolean gameFinished =false;
+	public double finalTime = 0;
+
 	
 	public UI(GamePanel gp) {
 		this.gp = gp;
@@ -34,28 +36,31 @@ public class UI {
 	public void draw(Graphics2D g2) {
 		
 		if(gameFinished == true) {
-			
-			String text;
-			int textLength;
-			int x;
-			int y;
-			
-			g2.setFont(arial_80B);
-			g2.setColor(Color.orange);
-			text = "Congratulations!";
-			textLength = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-			x = gp.screenWidth/2 - textLength/2;
-			y = gp.screenWidth/2 + (gp.tileSize*2);
-			g2.drawString(text, x, y);
-			
-			text = "You Won!";
-			textLength = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-			x = gp.screenWidth/2 - textLength/2;
-			y = gp.screenWidth/2 + (gp.tileSize*3 +26);
-			g2.drawString(text, x, y);
-			
-			gp.gameThread = null;
+
+		    if(finalTime == 0) {
+		        finalTime = gp.getGameTimeSeconds();
+		    }
+
+		    g2.setFont(arial_80B);
+		    g2.setColor(Color.orange);
+
+		    String text = "Game Finished!";
+		    int textLength = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+		    int x = gp.screenWidth/2 - textLength/2;
+		    int y = gp.screenHeight/2 + (gp.tileSize*4 );
+		    g2.drawString(text, x, y);
+
+		    g2.setFont(g2.getFont().deriveFont(40F));
+		    String timeText = "Final Time: " + String.format("%.2f", finalTime) + " s";
+
+		    textLength = (int)g2.getFontMetrics().getStringBounds(timeText, g2).getWidth();
+		    x = gp.screenWidth/2 - textLength/2;
+		    y = gp.screenHeight/2 + (gp.tileSize*5 +20);
+		    g2.drawString(timeText, x, y);
+
+		    gp.gameThread = null;
 		}
+
 		else {
 			g2.setFont(arial_40);
 			g2.setColor(Color.white);

@@ -1,5 +1,6 @@
 package khouim;
 
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -12,7 +13,7 @@ import javax.swing.JPanel;
 import entity.Player;
 import object.SuperObject;
 import tile.TileManager;
-import tile.TileManager;
+
 public class GamePanel extends JPanel implements Runnable {
 	
 	private static final long serialVersionUID = 1L;
@@ -95,7 +96,7 @@ public class GamePanel extends JPanel implements Runnable {
             e.printStackTrace();
         }
 
-        // 2️⃣ Save to Snowflake
+         //2️⃣ Save to Snowflake
         SnowflakeConnector.saveEvent(eventName, timeSeconds);
     }
     
