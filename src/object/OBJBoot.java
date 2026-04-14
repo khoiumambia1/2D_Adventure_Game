@@ -6,14 +6,14 @@ import javax.imageio.ImageIO;
 
 import khouim.GamePanel;
 
-public class OBJKey extends SuperObject {
+public class OBJBoot extends SuperObject {
     GamePanel gp;
     
-    public OBJKey(GamePanel gp) {
+    public OBJBoot(GamePanel gp) {
         this.gp = gp;
-        name = "Key";
+        name = "Boot";
         try {
-            image = ImageIO.read(getClass().getResourceAsStream("/objects/key.png"));
+            image = ImageIO.read(getClass().getResourceAsStream("/objects/boots.png"));
             if(image != null) {
                 image = uTool.scaledImage(image, gp.tileSize, gp.tileSize);
             }

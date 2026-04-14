@@ -4,16 +4,20 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class OBJDoor extends SuperObject{
-	
-	public OBJDoor() {
-		name = "Door";
-		try {
-			image = ImageIO.read(getClass().getResourceAsStream("/objects/door.png"));
-		}catch(IOException e) {
-			e.printStackTrace();
-		}
-		collision = true;
-	}
+import khouim.GamePanel;
 
+public class OBJDoor extends SuperObject {
+    GamePanel gp;
+    
+    public OBJDoor(GamePanel gp) {
+        this.gp = gp;
+        name = "Door";
+        try {
+            image = ImageIO.read(getClass().getResourceAsStream("/objects/door.png"));
+            if(image != null) {
+                image = uTool.scaledImage(image, gp.tileSize, gp.tileSize);
+            }
+        } catch(IOException e) {}
+        collision = true;
+    }
 }
